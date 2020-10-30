@@ -1,5 +1,5 @@
 from enum import Enum
-rate = 2
+rate = 1
 
 class Color(Enum):
   RED = (0, 0, 255)
@@ -50,6 +50,10 @@ class CommonLimit():
   formItemBackgroundGray = 255
   formItemLeftTextLimit = 20 * rate # formitem  距离label左边间距阈值
   formItemHeightMarginLimit = 20 * rate # fromitem距离上面的formitem 距离阈值
+
+class SpectialText():
+  date_form_text_flag = {"list": ["日期"], "value": "date"}
+  time_form_text_flag = {"list": ["时间"], "value": "time"}
 
 class ButtonSize(Enum):
   large = 40 * rate

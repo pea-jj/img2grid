@@ -54,3 +54,5 @@ def reorganize(cfs):
         return 0
     return sorted(cfs, key = cmp_to_key(my_sort))
 
+def str_find_in_list(s, t_list):
+    return any([s.find(item) != -1 for item in t_list])

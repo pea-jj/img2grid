@@ -1,6 +1,6 @@
 from img_process import ImgProess
-from enums import AreaCategory, CommonLimit, ButtonSize, Color, FormItemType
-from util import approximate_same, approximate_inrange, approximate_enumsame, is_same_range, is_contain_rect, reorganize
+from enums import AreaCategory, CommonLimit, ButtonSize, Color, FormItemType, SpectialText, rate
+from util import approximate_same, approximate_inrange, approximate_enumsame, is_same_range, is_contain_rect, reorganize, str_find_in_list
 
 class GetSchema:
     def __init__(self, categorys_list, img):
@@ -88,7 +88,20 @@ class GetSchema:
                 if approximate_same(text_cf.x + text_cf.w, form_item_cf.x, CommonLimit.formItemLeftTextLimit) and approximate_same(text_cf.y, form_item_cf.y, 5*CommonLimit.diffPix):
                     label = text_cf.text
                     break
-            filter_schema["items"].append({"label": label, "type": FormItemType.get(form_item_cf.category_type.name), "row": row})
+            contain_cfs = self.in_rect_cfs({'x': form_item_cf.x, 'y': form_item_cf.y, 'w': form_item_cf.w, 'h': form_item_cf.h}, self._text_list)
+            contain_texts = [item.text for item in contain_cfs if item.text and len(item.text) > 1]
+            placeholder = ''
+            if len(contain_texts):
+                placeholder = contain_texts[0]
+
+            if placeholder and str_find_in_list(placeholder, SpectialText.date_form_text_flag["list"]):
+                form_type = SpectialText.date_form_text_flag["value"]
+            elif placeholder and str_find_in_list(placeholder, SpectialText.time_form_text_flag["list"]):
+                form_type = SpectialText.date_form_text_flag["value"]
+            else:
+                form_type =  FormItemType.get(form_item_cf.category_type.name)
+
+            filter_schema["items"].append({"label": label, "type": form_type, "placeholder": placeholder, "width": int(form_item_cf.w / rate) ,"row": row})
         return filter_schema
 
     def find_grid_top_rect(self, x_left_top, y_left_top, x_right_bottom, y_right_bottom):
