@@ -101,7 +101,7 @@ class FeatureClassification:
                 h = cf.h
                 cv.rectangle(tempImg, (x, y),
                                 (x + w, y + h), color_list[index].value, 2)
-                cv.putText(tempImg,str(cf.category_type.value),(x,y),cv.FONT_HERSHEY_COMPLEX,1,(0,0,255),1)
+                cv.putText(tempImg,str(cf.category_type.name),(x,y),cv.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255),1)
             index += 1
         cv.imwrite('./out/5_cf.jpg', tempImg)
 
@@ -131,27 +131,27 @@ class FeatureClassification:
 
 class Feature:
     def __init__(self, x, y, w, h, rect=None, roi=None, roiGray=None, ratewh=None, offset_bottom=None, offset_bottom_rate=None, offset_top_rate=None, ratew=None, mean=None, area=None, length=None, rateArea=None, max_indx_value=None, cnt_num=None, contour_feature=None, cnt=None, text=None):
-        self.roi = roi
-        self.roiGray = roiGray
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-        self.ratewh = ratewh
-        self.offset_bottom = offset_bottom
-        self.offset_bottom_rate = offset_bottom_rate
-        self.offset_top_rate = offset_top_rate
-        self.ratew = ratew
-        self.mean = mean
-        self.area = area
-        self.length = length
-        self.rateArea = rateArea
-        self.max_indx_value = max_indx_value
-        self.cnt_num = cnt_num
-        self.contour_feature = contour_feature
-        self.rect = rect
-        self.cnt = cnt
-        self.text = text
+        self.roi = roi # rgb
+        self.roiGray = roiGray # 灰度
+        self.x = x # 左上角x坐标
+        self.y = y # 左上角y坐标
+        self.w = w # 宽度
+        self.h = h # 高度
+        self.ratewh = ratewh # 宽高比
+        self.offset_bottom = offset_bottom # 距离底部距离
+        self.offset_bottom_rate = offset_bottom_rate # 距离底部距离占图像高度比
+        self.offset_top_rate = offset_top_rate # 距离顶部距离占图像高度比
+        self.ratew = ratew # 宽度占图像宽度比
+        self.mean = mean # 灰度均值
+        self.area = area # 面积
+        self.length = length # 周长
+        self.rateArea = rateArea # 面积占图像面积比
+        self.max_indx_value = max_indx_value # 灰度直方图最高值
+        self.cnt_num = cnt_num # 轮廓点数量
+        self.contour_feature = contour_feature # 轮廓特征
+        self.rect = rect # 矩形
+        self.cnt = cnt # 轮廓
+        self.text = text # 文本
 
     def calulate_category(self, dropdown_cnt):
         contour_feature = self.contour_feature

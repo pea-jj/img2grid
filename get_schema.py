@@ -1,4 +1,5 @@
 from img_process import ImgProess
+import json
 from enums import AreaCategory, CommonLimit, ButtonSize, Color, FormItemType, SpectialText, rate
 from util import approximate_same, approximate_inrange, approximate_enumsame, is_same_range, is_contain_rect, reorganize, str_find_in_list
 
@@ -14,10 +15,15 @@ class GetSchema:
         self._select_list = categorys_list.get(AreaCategory.SELECT) or []
 
     def run(self):
+        schema = {}
         grid_schema = self.get_grid_schema()
         operation_schema = self.get_operation_schema()
         filter_schema = self.get_filter_schema()
-        print(grid_schema, operation_schema, filter_schema)
+        schema["grid_schema"] = grid_schema
+        schema["operation_schema"] = operation_schema
+        schema["filter_schema"] = filter_schema
+        result = json.dumps(schema)
+        print(result)
         return {"grid_schema": grid_schema, "operation_schema": operation_schema, "filter_schema": filter_schema}
     
     def get_grid_core_area(self):
@@ -41,8 +47,16 @@ class GetSchema:
             x_left_top, y_left_top, x_right_bottom, y_right_bottom)
        
         # grid_dict['centerList'] = center_list
-        grid_dict['cloumns'] = [x_left_top_t,
-                                    y_left_top_t, x_right_bottom_t, y_right_bottom_t]
+        grid_dict['cloumns'] = [x_left_top_t, y_left_top_t, x_right_bottom_t, y_right_bottom_t]
+
+        # 获取gird edit项
+        grid_text_cfs = self.in_rect_cfs({'x': x_left_top, 'y': y_left_top, 'w': x_right_bottom - x_left_top, 'h': y_right_bottom - y_left_top}, self._text_list)
+        edit_items = []
+        for cf in grid_text_cfs:
+            text = cf.text
+            if text.find('|') != -1:
+                edit_items.append(text.split('|'))
+        grid_dict["edit"] = edit_items[0]
         return grid_dict
 
     def get_grid_schema(self):
@@ -50,9 +64,18 @@ class GetSchema:
         columns_area = grid_dict.get('cloumns')
         contain_cfs = self.in_rect_cfs({'x': columns_area[0], 'y': columns_area[1], 'w': columns_area[2] - columns_area[0], 'h': columns_area[3] - columns_area[1]}, self._text_list)
         grid_schema = {"grid_column": []}
-        for cf in contain_cfs:
+        for index, cf in enumerate(contain_cfs):
+            column_width = columns_area[2] - columns_area[0]
+            item = {}
             text = cf.text
-            grid_schema['grid_column'].append({"title": text})
+            item["title"] = text
+            # 获取宽度
+            if (index < len(contain_cfs) - 1):
+                nextx = contain_cfs[index + 1].x
+                item["width"] = str(int((nextx - cf.x)/column_width * 100)) + '%'
+            grid_schema['grid_column'].append(item)
+
+        grid_schema["edit"] = grid_dict["edit"]    
         return grid_schema
 
     def in_rect_cfs(self, rect, cfs):
